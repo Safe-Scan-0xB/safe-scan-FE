@@ -15,7 +15,7 @@ export default function BtnLong({
   className = "",
 }: BtnProps) {
   const base =
-  "w-full max-w-[450px] sm:max-w-md md:max-w-lg lg:max-w-3xl py-3 flex items-center justify-center rounded-[4.18px] text-white font-sans font-semibold transition-all duration-200";
+  "w-full max-w-[450px] sm:max-w-md md:max-w-lg lg:max-w-3xl py-3.5 flex items-center justify-center rounded-[4.18px] text-white font-sans font-semibold ";
   const active = "bg-[#2C3E54] hover:bg-[#233147]";
   const inactive = "bg-gray-400 cursor-not-allowed";
 

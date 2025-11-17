@@ -2,11 +2,13 @@
 import { useState } from "react";
 import logo from "../assets/icon/Logo.png";
 import profileIcon from "../assets/icon/profile.svg";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Header() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태
+
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     setIsLoggedIn(false);
@@ -15,19 +17,18 @@ export default function Header() {
   };
 
   const handleLogin = () => {
-    setIsLoggedIn(true);
     setIsModalOpen(false);
-    // 실제 로그인 로직 추가 가능
+    navigate("/login");  
   };
 
   return (
-    <header className="w-full flex justify-between items-center px-4 py-3 bg-white  fixed top-0 left-0 z-50">
+    <header className="w-full flex justify-between items-center pl-4 pr-7 py-3 bg-white  fixed top-0 left-0 z-50">
       {/* 왼쪽 로고 */}
       <Link to="/" className="flex items-center">
         <img
           src={logo}
           alt="SafeScan Logo"
-          className="h-9 sm:h-10 md:h-11 lg:h-12 w-auto transition-all duration-200"
+          className="h-12 sm:h-12 md:h-12 lg:h-14 w-auto transition-all duration-200"
         />
         </Link>
 
@@ -39,7 +40,7 @@ export default function Header() {
           onClick={() => setIsModalOpen(!isModalOpen)}
           className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-gray-200 transition-all"
         >
-          <img src={profileIcon} alt="Profile" className="w-7 h-7 sm:w-7 sm:h-7 md:w-8 md:h-8 lg:w-8 lg:h-8 transition-all duration-200" />
+          <img src={profileIcon} alt="Profile" className="w-8 h-8 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-9 lg:h-9 transition-all duration-200" />
         </button>
 
         {/* 아이콘 밑으로 뜨는 모달 */}

@@ -4,17 +4,11 @@
 
 @font-face {
   font-family: "ArialRounded";
-  src: url("/src/assets/fonts/ArialRoundedMTBold.woff2") format("woff2");
+  src: url("/src/assets/fonts/ArialRoundedMTBold.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
 }
 
-@font-face {
-  font-family: "Gantari";
-  src: url("/src/assets/fonts/Gantari-Bold.otf") format("opentype");
-  font-weight: 700;
-  font-style: normal;
-}
 @font-face {
   font-family: "Gantari";
   src: url("/src/assets/fonts/Gantari-Bold.otf") format("opentype");
@@ -29,7 +23,7 @@
 }
 @font-face {
   font-family: "Gantari";
-  src: url("/src/assets/fonts/Gantari-Regural.otf") format("opentype");
+  src: url("/src/assets/fonts/Gantari-Regular.otf") format("opentype");
   font-weight: 500;
   font-style: normal;
 }
@@ -38,4 +32,26 @@
   src: url("/src/assets/fonts/Gantari-Light.otf") format("opentype");
   font-weight: 400;
   font-style: normal;
+}
+
+/* Swiper 페이지네이션 위치를 카드 아래로 */
+.swiper-pagination {
+  position: relative !important;
+  margin-top: 12px; 
+}
+
+/* 점 크기 줄이기 */
+.swiper-pagination-bullet {
+  width: 7px !important;
+  height: 7px !important;
+  background: #D2D2D2 !important; /* 기본 점 색상 */
+  opacity: 1 !important;
+  margin: 0 3px !important;
+}
+
+/* 활성화된 점 색상 */
+.swiper-pagination-bullet-active {
+  background: #2C3E54 !important;  
+  width: 7px !important;
+  height: 7px !important;
 }
