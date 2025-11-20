@@ -8,7 +8,7 @@ import sendIconActive from "../assets/icon/send_iconActive.svg";
 export default function ChatPage() {
   const [messages, setMessages] = useState([
     { role: "ai", text: "안녕하세요! 무엇을 도와드릴까요?", time: "오전 10:23" },
-    { role: "user", text: "내가 지금 사기를 당한 것 같은데 어떻게 해야할지 알려줘", time: "오전 10:24" },
+    { role: "user", text: "내가 지금 사기를 당한 것 같은데 ..", time: "오전 10:24" },
   ]);
 
   const [inputText, setInputText] = useState("");

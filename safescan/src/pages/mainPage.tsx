@@ -97,7 +97,7 @@ function MainPage() {
               content="최근 올라온 링크 중 위험한 URL을 정리해봤습니다."
               date="2025.03.12"
               commentCount={12}
-              imageUrl={exampleImage}
+              imageUrls={exampleImage}
               />
             </SwiperSlide>
             <SwiperSlide className="!w-full">
