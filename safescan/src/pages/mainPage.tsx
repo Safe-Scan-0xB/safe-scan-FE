@@ -18,33 +18,35 @@ function MainPage() {
   const [searchValue, setSearchValue] = useState("");
   const [hotPosts, setHotPosts] = useState<any[]>([]);
   const API_BASE_URL = import.meta.env.VITE_API_URL; // VITE_API_URL로 변경
+  console.log("API URL:", API_BASE_URL);
 
   useEffect(() => {
-    console.log("API URL:", import.meta.env.VITE_API_URL);
+  const fetchHotPosts = async () => {
+    try {
+      // 외부 HTTPS 프록시 추가
+      const PROXY = "https://cors-anywhere.herokuapp.com/";
+      const res = await fetch(PROXY + `${API_BASE_URL}/posts/hot`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-    const fetchHotPosts = async () => {
-      try {
-        const res = await fetch(`${API_BASE_URL}/posts/hot`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!res.ok) {
-          console.error("HOT 게시글 불러오기 실패");
-          return;
-        }
-
-        const data = await res.json();
-        setHotPosts(data); 
-      } catch (err) {
-        console.error("서버 연결 실패:", err);
+      if (!res.ok) {
+        console.error("HOT 게시글 불러오기 실패");
+        return;
       }
-    };
 
-    fetchHotPosts();
-  }, []);
+      const data = await res.json();
+      setHotPosts(data); 
+    } catch (err) {
+      console.error("서버 연결 실패:", err);
+    }
+  };
+
+  fetchHotPosts();
+}, []);
+
 
   const handleSearch = async () => {
     if (!searchValue) return;
@@ -56,10 +58,13 @@ function MainPage() {
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
 
-      const res = await fetch(`${API_BASE_URL}/scan?url=${encodeURIComponent(searchValue)}`, {
-        method: "GET",
-        headers,
-      });
+      const PROXY = "https://cors-anywhere.herokuapp.com/";
+
+const res = await fetch(PROXY + `${API_BASE_URL}/scan?url=${encodeURIComponent(searchValue)}`, {
+  method: "GET",
+  headers,
+});
+
 
       const data = await res.json();
 
