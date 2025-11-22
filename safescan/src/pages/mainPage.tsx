@@ -17,11 +17,12 @@ function MainPage() {
   const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState("");
   const [hotPosts, setHotPosts] = useState<any[]>([]);
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
     const fetchHotPosts = async () => {
       try {
-        const res = await fetch("/api/posts/hot", {
+        const res = await fetch(`${API_BASE_URL}/posts/hot`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -53,7 +54,7 @@ function MainPage() {
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
 
-      const res = await fetch(`/api/scan?url=${encodeURIComponent(searchValue)}`, {
+      const res = await fetch(`${API_BASE_URL}/scan?url=${encodeURIComponent(searchValue)}`, {
         method: "GET",
         headers,
       });

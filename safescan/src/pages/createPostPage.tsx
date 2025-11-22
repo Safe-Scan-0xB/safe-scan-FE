@@ -15,6 +15,7 @@ function CreatePostPage() {
   const [previewImages, setPreviewImages] = useState<string[]>([]);
   const [files, setFiles] = useState<File[]>([]);
   const [category, setCategory] = useState<Category>("사례 공유");
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   const categories: Category[] = ["사례 공유", "피해자 찾기", "기타"];
 
@@ -73,7 +74,7 @@ function CreatePostPage() {
     try {
       const token = localStorage.getItem("access_token");
 
-      const response = await fetch("/api/posts", {
+      const response = await fetch(`${API_BASE_URL}/posts`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

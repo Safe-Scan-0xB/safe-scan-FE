@@ -61,6 +61,7 @@ function DetailPostPage() {
 
   const menuRef = useRef<HTMLDivElement | null>(null);
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 
   // 게시글 불러오기
@@ -69,7 +70,7 @@ function DetailPostPage() {
 
     const fetchPost = async () => {
       try {
-        const res = await fetch(`/api/posts/${id}`, {
+        const res = await fetch(`${API_BASE_URL}/posts/${id}`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         });
@@ -92,7 +93,7 @@ function DetailPostPage() {
 
     const fetchComments = async () => {
       try {
-        const res = await fetch(`/api/posts/${id}/comments`, {
+        const res = await fetch(`${API_BASE_URL}/posts/${id}/comments`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         });
@@ -144,7 +145,7 @@ function DetailPostPage() {
       return;
     }
     try {
-      const res = await fetch(`/api/posts/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/posts/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -175,7 +176,7 @@ function DetailPostPage() {
       return;
     }
     try {
-      const res = await fetch(`/api/posts/${id}/comments`, {
+      const res = await fetch(`${API_BASE_URL}/posts/${id}/comments`,  {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ content: commentInput }),
@@ -207,7 +208,7 @@ function DetailPostPage() {
       return;
     }
     try {
-      const res = await fetch(`/api/posts/${id}/comments/${commentId}`, {
+      const res = await fetch(`${API_BASE_URL}/posts/${id}/comments/${commentId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -271,7 +272,7 @@ function DetailPostPage() {
           {post.images.map((img) => {
             const imageUrl = img.url.startsWith("http") 
             ? img.url 
-            : `http://13.124.192.14:8080${img.url}`; 
+            : `${API_BASE_URL}${img.url}`;
             return (
             <img
             key={img.id}

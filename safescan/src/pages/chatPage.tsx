@@ -16,7 +16,8 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
   const chatBoxRef = useRef<HTMLDivElement>(null);
-
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  
   const date = new Date();
   const today = `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(
     date.getDate()
@@ -32,7 +33,7 @@ export default function ChatPage() {
           return;
         }
 
-        const res = await fetch("/api/chat", {
+        const res = await fetch(`${API_BASE_URL}/chat`, {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -95,7 +96,7 @@ export default function ChatPage() {
         return;
       }
 
-      const res = await fetch("/api/chat", {
+      const res = await fetch(`${API_BASE_URL}/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

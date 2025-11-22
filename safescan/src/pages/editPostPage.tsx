@@ -18,6 +18,7 @@ function EditPostPage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [category, setCategory] = useState<Category>("사례 공유");
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 
   const [existingImages, setExistingImages] = useState<ExistingImage[]>([]);
@@ -29,7 +30,7 @@ function EditPostPage() {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const res = await fetch(`/api/posts/${postId}`);
+        const res = await fetch(`${API_BASE_URL}/posts/${postId}`);
         if (!res.ok) throw new Error("게시글을 불러오지 못했습니다.");
 
         const data = await res.json();
@@ -45,7 +46,7 @@ function EditPostPage() {
         ...img,
         url: img.url.startsWith("http")
           ? img.url
-          : `http://13.124.192.14:8080${img.url}`,
+          : `${API_BASE_URL}${img.url}`,
       }));
 
       setExistingImages(fixedImages);
@@ -103,7 +104,7 @@ function EditPostPage() {
     });
 
     try {
-      const res = await fetch(`/api/posts/${postId}`, {
+      const res = await fetch(`${API_BASE_URL}/posts/${postId}`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,

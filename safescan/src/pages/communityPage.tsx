@@ -30,6 +30,7 @@ function CommunityPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showTip, setShowTip] = useState(true);
   const [posts, setPosts] = useState<Post[]>([]);
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
     const hidden = sessionStorage.getItem("communityCreateTooltipHidden");
@@ -39,7 +40,7 @@ function CommunityPage() {
   useEffect(() => {
   const fetchPosts = async () => {
     try {
-      const res = await fetch("/api/posts", {
+      const res = await fetch(`${API_BASE_URL}/posts`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
