@@ -5,7 +5,6 @@ import TabBar from "../components/TabBar";
 import Header from "../components/Header";
 import PostCard from "../components/PostCard"; 
 import plusIcon from "../assets/icon/plus.svg";
-import exampleImage from "../assets/icon/Image.png";
 import bubble from "../assets/icon/bubble.svg"; 
 import bubbleTail from "../assets/icon/bubble_tail.svg"; 
 import x from "../assets/icon/x_icon.svg"; 
@@ -15,44 +14,12 @@ type Category = "전체" | "사례 공유" | "피해자 찾기" | "기타";
 type Post = {
   id: number;
   title: string;
-  content: string;
-  category: Category;
+  excerpt: string;
+  categoryName: Category;
   createdAt: string;
   commentCount: number;
   imageUrls?: string[];
 };
-
-const MOCK_POSTS: Post[] = [
-  {
-    id: 1,
-    title: "SNS 해외취업 스카웃 사기 후기",
-    content:
-      "SNS로 높은 급여를 제시하며 접근해온 사기 사례입니다. 여러 피해자가 비슷한 패턴으로 접근받았습니다...",
-    category: "사례 공유",
-    createdAt: "2025.11.15",
-    commentCount: 3,
-    imageUrls: [exampleImage]
-  },
-  {
-    id: 2,
-    title: "수상한 전화번호 제보합니다",
-    content:
-      "대출 상환을 도와주겠다며 계좌이체를 요구하는 의심 전화가 왔습니다...",
-    category: "피해자 찾기",
-    createdAt: "2025.11.14",
-    commentCount: 1,
-    imageUrls: [exampleImage]
-  },
-  {
-    id: 3,
-    title: "보이스피싱 문자 링크 의심",
-    content:
-      "문자로 온 URL을 눌렀더니 이상한 사이트로 이동했습니다...",
-    category: "기타",
-    createdAt: "2025.11.10",
-    commentCount: 0,
-  },
-];
 
 const CATEGORIES: Category[] = ["전체", "사례 공유", "피해자 찾기", "기타"];
 
@@ -62,25 +29,63 @@ function CommunityPage() {
   const [selectedCategory, setSelectedCategory] = useState<Category>("전체");
   const [searchTerm, setSearchTerm] = useState("");
   const [showTip, setShowTip] = useState(true);
+  const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
     const hidden = sessionStorage.getItem("communityCreateTooltipHidden");
     if (hidden === "true") setShowTip(false);
   }, []);
 
+  useEffect(() => {
+  const fetchPosts = async () => {
+    try {
+      const res = await fetch("/api/posts", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!res.ok) {
+        console.error("게시글 불러오기 실패");
+        return;
+      }
+
+      const data = await res.json();
+
+      //Enum → 한글 매핑
+      const categoryNameMap: Record<string, Category> = {
+        "CASE_SHARE": "사례 공유",
+        "FIND_VICTIM": "피해자 찾기",
+        "ETC": "기타",
+      };
+
+      const formattedPosts = data.content.map((post: any) => ({
+        ...post,
+        categoryName: categoryNameMap[post.categoryName] || "기타",
+      }));
+
+      setPosts(formattedPosts);
+    } catch (err) {
+      console.error("서버 연결 실패:", err);
+    }
+  };
+
+  fetchPosts();
+}, []);
+
+
   const handleCloseTip = () => {
     setShowTip(false);
     sessionStorage.setItem("communityCreateTooltipHidden", "true");
   };
 
-  const filteredPosts = MOCK_POSTS.filter((post) => {
+  const filteredPosts = posts.filter((post) => {
     const matchCategory =
-      selectedCategory === "전체" || post.category === selectedCategory;
+      selectedCategory === "전체" || post.categoryName === selectedCategory;
     const keyword = searchTerm.trim().toLowerCase();
     const matchSearch =
       keyword === "" ||
       post.title.toLowerCase().includes(keyword) ||
-      post.content.toLowerCase().includes(keyword);
+      post.excerpt.toLowerCase().includes(keyword);
     return matchCategory && matchSearch;
   });
 
@@ -132,7 +137,7 @@ function CommunityPage() {
               >
                 <PostCard
                   title={post.title}
-                  content={post.content}
+                  content={post.excerpt}
                   date={post.createdAt}
                   commentCount={post.commentCount}
                   imageUrls={post.imageUrls?.[0]}
@@ -143,7 +148,7 @@ function CommunityPage() {
         </section>
       </main>
 
-      {/* 질문 생성 플로팅 버튼 + 말풍선 */}
+      {/* 질문 생성 버튼 + 말풍선 */}
       <div className="fixed bottom-[80px] right-5 z-40 flex flex-col items-end">
         {/* 말풍선 */}
         {showTip && (
@@ -153,13 +158,13 @@ function CommunityPage() {
               alt="말풍선 배경"
               className="absolute inset-0 w-full h-full object-contain"
             />
-            <div className="absolute inset-0 flex items-center justify-between pl-5 pr-3">
+            <div className="absolute inset-0 flex items-center justify-center pl-4 pr-0">
               <span className="text-white text-xs sm:text-sm">
                 피해 사례를 등록해보세요.
               </span>
               <button
                 onClick={handleCloseTip}
-                className="text-white p-1"
+                className="text-white p-3 "
               >
                 <img src={x} alt="닫기" className="w-4 h-4" />
               </button>

@@ -9,6 +9,7 @@ import DagerPage from "./pages/resultDangerPage";
 import DetailPostPage from "./pages/detailPostPage";
 import CreatePostPage from "./pages/createPostPage";
 import EditPostPage from "./pages/editPostPage";
+import SignupPage from "./pages/signupPage";
 
 function App() {
   return (
@@ -17,11 +18,12 @@ function App() {
       <Route path="/community" element={<CommunityPage />} />
       <Route path="/chatbot" element={<ChatPage />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<SignupPage />} />
       <Route path="/result/safe" element={<SafePage />} />
       <Route path="/result/danger" element={<DagerPage />} />
       <Route path="/community/create" element={<CreatePostPage />} />
       <Route path="/community/:id" element={<DetailPostPage />} />
-      <Route path="/community/edit/:id" element={<EditPostPage />} />
+      <Route path="/community/edit/:postId" element={<EditPostPage />} />
     </Routes>
 
   );

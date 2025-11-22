@@ -1,101 +1,158 @@
 import { useState, useEffect } from "react";
 import BtnLong from "../components/btn";
 import cameraIcon from "../assets/icon/icon_camera.svg";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import BackButton from "../components/BackButton";
 
 type Category = "사례 공유" | "피해자 찾기" | "기타";
 
+type ExistingImage = {
+  id: number;
+  url: string;
+};
+
 function EditPostPage() {
-  const { postId } = useParams(); // 수정할 게시물 ID
+  const { postId } = useParams();
+  const navigate = useNavigate();
+
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [images, setImages] = useState<string[]>([]);
   const [category, setCategory] = useState<Category>("사례 공유");
+
+
+  const [existingImages, setExistingImages] = useState<ExistingImage[]>([]);
+
+  const [newImages, setNewImages] = useState<File[]>([]);
 
   const categories: Category[] = ["사례 공유", "피해자 찾기", "기타"];
 
-  //  기존 게시물 데이터를 불러오는 useEffect
   useEffect(() => {
-    // 백엔드 연동 전 프론트 테스트용 임시 데이터
-    const fetchedPost = {
-      title: "기존 게시물 제목",
-      content: "기존 게시물 내용",
-      images: [
-        "https://via.placeholder.com/150",
-        "https://via.placeholder.com/200",
-      ],
-      category: "피해자 찾기" as Category,
+    const fetchPost = async () => {
+      try {
+        const res = await fetch(`/api/posts/${postId}`);
+        if (!res.ok) throw new Error("게시글을 불러오지 못했습니다.");
+
+        const data = await res.json();
+
+        setTitle(data.title);
+        setContent(data.content);
+        if (categories.includes(data.category)) {
+          setCategory(data.category);
+        } else {
+          setCategory("사례 공유"); 
+          }
+        const fixedImages = (data.images || []).map((img: ExistingImage) => ({
+        ...img,
+        url: img.url.startsWith("http")
+          ? img.url
+          : `http://13.124.192.14:8080${img.url}`,
+      }));
+
+      setExistingImages(fixedImages);
+      } catch (err) {
+        console.error(err);
+      }
     };
 
-    setTitle(fetchedPost.title);
-    setContent(fetchedPost.content);
-    setImages(fetchedPost.images);
-    setCategory(fetchedPost.category);
+    fetchPost();
   }, [postId]);
 
   const handleImageUpload = (e: any) => {
     if (!e.target.files) return;
     const files = Array.from(e.target.files) as File[];
-    const newImages = [...images];
 
-    files.forEach((file) => {
-      if (newImages.length < 9) {
-        const url = URL.createObjectURL(file);
-        newImages.push(url);
-      }
-    });
+    if (existingImages.length + newImages.length + files.length > 9) {
+      alert("이미지는 최대 9장까지 업로드할 수 있습니다.");
+      return;
+    }
 
-    setImages(newImages);
+    setNewImages((prev) => [...prev, ...files]);
     e.target.value = "";
   };
 
-  const removeImage = (index: number) => {
-    setImages(images.filter((_, i) => i !== index));
+
+  const removeExistingImage = (id: number) => {
+    setExistingImages((prev) => prev.filter((img) => img.id !== id));
   };
 
-  const handleEdit = () => {
-    // API 전 연결 전 테스트
-    console.log({
-      title,
-      content,
-      images,
-      category,
+  const removeNewImage = (index: number) => {
+    setNewImages((prev) => prev.filter((_, idx) => idx !== index));
+  };
+
+
+  const handleEdit = async () => {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    const formData = new FormData();
+
+    formData.append("title", title);
+    formData.append("content", content);
+    formData.append("categoryName", category);
+
+    existingImages.forEach((img) => {
+      formData.append("keepPhotoIds", img.id.toString());
     });
-    alert("수정 완료");
+
+
+    newImages.forEach((file) => {
+      formData.append("newImages", file);
+    });
+
+    try {
+      const res = await fetch(`/api/posts/${postId}`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error("수정 실패");
+      }
+
+      alert("수정 완료되었습니다!");
+      navigate("/community");
+    } catch (err) {
+      console.error(err);
+      alert("게시물 수정에 실패했습니다.");
+    }
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-white px-4">
       {/* 상단 헤더 */}
       <header className="relative w-full flex items-center pt-6 pb-2 bg-white">
-              <BackButton
-                className="h-8 sm:h-9 md:h-9 lg:h-9 w-auto transition-all duration-200"
-              />
-              <h2 className="absolute left-1/2 -translate-x-1/2 text-lg font-medium text-[22px]">
-                게시물 수정
-              </h2>
+        <BackButton className="h-8 w-auto" />
+        <h2 className="absolute left-1/2 -translate-x-1/2 text-lg font-medium text-[22px]">
+          게시물 수정
+        </h2>
       </header>
 
-      <div className="w-full max-w-[500px] sm:max-w-[600px] md:max-w-[800px] lg:max-w-[1000px] mx-auto">
+      <div className="w-full max-w-[600px] mx-auto">
         {/* 제목 */}
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="제목을 작성해주세요."
-          className="w-full border border-gray-200 rounded-md px-3 py-3 mt-5 mb-3 text-sm sm:text-base bg-gray-50"
+          className="w-full border border-gray-200 rounded-md px-3 py-3 mt-5 mb-3 bg-gray-50"
         />
 
         {/* 내용 */}
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder="피해 사례를 작성해주세요."
-          className="w-full border border-gray-200 rounded-md px-3 py-3 mb-4 text-sm sm:text-base bg-gray-50 min-h-40 whitespace-pre-line"
+          placeholder="내용을 입력해주세요."
+          className="w-full border border-gray-200 rounded-md px-3 py-3 mb-4 bg-gray-50 min-h-40"
         />
 
-        {/* 이미지 업로드 */}
-        <div className="mb-5 flex items-center gap-3">
+        {/* 이미지 영역 */}
+        <div className="mb-5 flex items-start gap-3 flex-wrap">
+          {/* 업로드 버튼 */}
           <div>
             <input
               id="imageInput"
@@ -107,64 +164,75 @@ function EditPostPage() {
             />
             <label
               htmlFor="imageInput"
-              className="w-20 h-20 sm:w-24 sm:h-24 border border-gray-200 rounded-md bg-gray-50 flex flex-col items-center justify-center cursor-pointer"
+              className="w-20 h-20 border border-gray-200 rounded-md bg-gray-50 flex flex-col items-center justify-center cursor-pointer"
             >
-              <img
-                src={cameraIcon}
-                alt="사진 추가"
-                className="w-6 h-6 mb-1 opacity-70"
-              />
-              <span className="text-xs text-gray-500">{images.length}/9</span>
+              <img src={cameraIcon} alt="사진 추가" className="w-6 h-6 mb-1" />
+              <span className="text-xs text-gray-500">
+                {existingImages.length + newImages.length}/9
+              </span>
             </label>
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            {images.map((src, i) => (
-              <div
-                key={i}
-                className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-md overflow-hidden bg-gray-100"
+          {/* 기존 이미지 */}
+          {existingImages.map((img) => (
+            <div
+              key={img.id}
+              className="relative w-20 h-20 rounded-md overflow-hidden bg-gray-100"
+            >
+              <img src={img.url} className="w-full h-full object-cover" />
+              <button
+                type="button"
+                onClick={() => removeExistingImage(img.id)}
+                className="absolute top-1 right-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded-full"
               >
-                <img src={src} alt="" className="w-full h-full object-cover" />
-                <button
-                  type="button"
-                  onClick={() => removeImage(i)}
-                  className="absolute top-1 right-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded-full"
-                >
-                  X
-                </button>
-              </div>
-            ))}
-          </div>
+                X
+              </button>
+            </div>
+          ))}
+
+          {/* 새 이미지 미리보기 */}
+          {newImages.map((file, index) => (
+            <div
+              key={index}
+              className="relative w-20 h-20 rounded-md overflow-hidden bg-gray-100"
+            >
+              <img
+                src={URL.createObjectURL(file)}
+                className="w-full h-full object-cover"
+              />
+              <button
+                type="button"
+                onClick={() => removeNewImage(index)}
+                className="absolute top-1 right-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded-full"
+              >
+                X
+              </button>
+            </div>
+          ))}
         </div>
 
-        {/* 카테고리 선택 */}
-        <section className="mb-8 w-full">
-          <h2 className="text-sm sm:text-base font-bold mb-3">카테고리</h2>
-          <div className="flex gap-2 justify-start">
-            {categories.map((c) => {
-              const isActive = category === c;
-              return (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => setCategory(c)}
-                  className={`px-4 py-2 rounded-full text-sm sm:text-base transition-all ${
-                    isActive
-                      ? "bg-[#2C3E54] text-white"
-                      : "bg-gray-100 text-gray-600"
-                  }`}
-                >
-                  {c}
-                </button>
-              );
-            })}
+        {/* 카테고리 */}
+        <section className="mb-8">
+          <h2 className="text-sm font-bold mb-3">카테고리</h2>
+          <div className="flex gap-2">
+            {categories.map((c) => (
+              <button
+                key={c}
+                onClick={() => setCategory(c)}
+                className={`px-4 py-2 rounded-full text-sm ${
+                  category === c
+                    ? "bg-[#2C3E54] text-white"
+                    : "bg-gray-100 text-gray-600"
+                }`}
+              >
+                {c}
+              </button>
+            ))}
           </div>
         </section>
 
         {/* 수정 버튼 */}
-        <div className="w-full max-w-[500px] sm:max-w-[600px] md:max-w-[800px] lg:max-w-[1000px] mx-auto mb-8">
-          <BtnLong label="수정하기" className="w-full" onClick={handleEdit} />
-        </div>
+        <BtnLong label="수정하기" className="w-full mb-8" onClick={handleEdit} />
       </div>
     </div>
   );
