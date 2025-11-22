@@ -1,53 +1,75 @@
-// src/components/Header.tsx
-import { useState } from "react";
+import { useState, useContext, useEffect, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/icon/Logo.png";
 import profileIcon from "../assets/icon/profile.svg";
-import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 export default function Header() {
+  const { token, logout } = useContext(AuthContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태
-
+  const [isLoggedIn, setIsLoggedIn] = useState(!!token);
   const navigate = useNavigate();
 
+  const modalRef = useRef<HTMLDivElement | null>(null);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+
+  useEffect(() => {
+    setIsLoggedIn(!!token);
+  }, [token]);
+
+  const toggleModal = () => setIsModalOpen((prev) => !prev);
+
   const handleLogout = () => {
-    setIsLoggedIn(false);
+    logout();
     setIsModalOpen(false);
-    // 실제 로그아웃 로직 추가 가능
+    alert("로그아웃 되었습니다.");
   };
 
   const handleLogin = () => {
     setIsModalOpen(false);
-    navigate("/login");  
+    navigate("/login");
   };
 
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(e.target as Node) &&
+        !buttonRef.current?.contains(e.target as Node)
+      ) {
+        setIsModalOpen(false);
+      }
+    };
+
+    if (isModalOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isModalOpen]);
+
   return (
-    <header className="w-full flex justify-between items-center pl-4 pr-7 py-3 bg-white  fixed top-0 left-0 z-50">
-      {/* 왼쪽 로고 */}
+    <header className="w-full flex justify-between items-center pl-4 pr-7 py-3 bg-white fixed top-0 left-0 z-50">
       <Link to="/" className="flex items-center">
-        <img
-          src={logo}
-          alt="SafeScan Logo"
-          className="h-12 sm:h-12 md:h-12 lg:h-14 w-auto transition-all duration-200"
-        />
-        </Link>
+        <img src={logo} alt="SafeScan Logo" className="h-12 w-auto" />
+      </Link>
 
-
-      {/* 오른쪽 아이콘 + 모달 */}
       <div className="relative">
-        {/* 아이콘 버튼 */}
         <button
-          onClick={() => setIsModalOpen(!isModalOpen)}
-          className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-gray-200 transition-all"
+          ref={buttonRef}
+          onClick={toggleModal}
+          className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-gray-200"
         >
-          <img src={profileIcon} alt="Profile" className="w-8 h-8 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-9 lg:h-9 transition-all duration-200" />
+          <img src={profileIcon} alt="Profile" className="w-8 h-8" />
         </button>
 
-        {/* 아이콘 밑으로 뜨는 모달 */}
         {isModalOpen && (
           <div
+            ref={modalRef}
             className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg p-3 z-50"
-            onClick={(e) => e.stopPropagation()}
           >
             <ul className="space-y-2">
               {isLoggedIn ? (

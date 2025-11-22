@@ -16,24 +16,32 @@ export default function PostCard({
   commentCount,
   imageUrls,
 }: PostCardProps) {
+
+  const imageUrl = imageUrls
+  ? (imageUrls.startsWith("http") 
+      ? imageUrls 
+      : `http://13.124.192.14:8080${imageUrls}`)
+  : null;
+
+
   return (
     <div className="w-full border border-[#D9D9D9] bg-white rounded-[9px] p-4 flex gap-4 h-[125px] items-center">
       
-      {/* 왼쪽 이미지 영역 */}
-      {imageUrls && (
+      {imageUrl && (
         <div className="w-24 h-full flex-shrink-0 flex items-center">
           <img
-            src={imageUrls}
-            alt="post image"
-            className="w-24 h-24 object-cover rounded-md"
+          src={imageUrl}
+          alt="post image"
+          className="w-24 h-24 object-cover rounded-md"
           />
-        </div>
-      )}
+          </div>
+        )}
+
 
       {/* 오른쪽 텍스트 영역 */}
       <div className="flex-1 flex flex-col h-full">
         
-        {/* 제목 + 내용 묶음 */}
+        {/* 제목 + 내용 */}
         <div>
           {/* 제목 */}
           <h3 className="font-gantari font-medium text-[16px] md:text-[17px] lg:text-[17px] text-[#1E1E1E] mb-1">
@@ -46,7 +54,7 @@ export default function PostCard({
           </p>
         </div>
 
-        {/* 날짜 + 댓글 (맨 아래 고정) */}
+        {/* 날짜 + 댓글 */}
         <div className="mt-auto flex justify-between items-center text-[10px] sm:text-xs md:text-[12px] text-gray-400">
           <span>{date}</span>
           <div className="flex items-center gap-1">
