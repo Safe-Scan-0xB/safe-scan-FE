@@ -14,7 +14,8 @@ function LoginPage() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  const API_BASE_URL = import.meta.env.VITE_API_URL; // VITE_API_URL로 변경
+
 
   const handleLogin = async () => {
   if (!userId || !password) {

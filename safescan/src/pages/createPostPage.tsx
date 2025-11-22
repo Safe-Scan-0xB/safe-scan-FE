@@ -15,7 +15,8 @@ function CreatePostPage() {
   const [previewImages, setPreviewImages] = useState<string[]>([]);
   const [files, setFiles] = useState<File[]>([]);
   const [category, setCategory] = useState<Category>("사례 공유");
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  const API_BASE_URL = import.meta.env.VITE_API_URL; // VITE_API_URL로 변경
+
 
   const categories: Category[] = ["사례 공유", "피해자 찾기", "기타"];
 

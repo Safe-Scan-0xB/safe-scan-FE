@@ -30,7 +30,8 @@ function CommunityPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showTip, setShowTip] = useState(true);
   const [posts, setPosts] = useState<Post[]>([]);
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  const API_BASE_URL = import.meta.env.VITE_API_URL; // VITE_API_URL로 변경
+
 
   useEffect(() => {
     const hidden = sessionStorage.getItem("communityCreateTooltipHidden");

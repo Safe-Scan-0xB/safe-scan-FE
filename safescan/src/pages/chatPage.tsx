@@ -16,7 +16,8 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
   const chatBoxRef = useRef<HTMLDivElement>(null);
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  const API_BASE_URL = import.meta.env.VITE_API_URL; // VITE_API_URL로 변경
+
   
   const date = new Date();
   const today = `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(

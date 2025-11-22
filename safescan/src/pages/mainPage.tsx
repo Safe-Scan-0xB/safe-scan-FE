@@ -17,9 +17,11 @@ function MainPage() {
   const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState("");
   const [hotPosts, setHotPosts] = useState<any[]>([]);
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  const API_BASE_URL = import.meta.env.VITE_API_URL; // VITE_API_URL로 변경
 
   useEffect(() => {
+    console.log("API URL:", import.meta.env.VITE_API_URL);
+
     const fetchHotPosts = async () => {
       try {
         const res = await fetch(`${API_BASE_URL}/posts/hot`, {

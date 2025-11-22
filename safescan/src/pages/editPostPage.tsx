@@ -18,7 +18,8 @@ function EditPostPage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [category, setCategory] = useState<Category>("사례 공유");
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  const API_BASE_URL = import.meta.env.VITE_API_URL; // VITE_API_URL로 변경
+
 
 
   const [existingImages, setExistingImages] = useState<ExistingImage[]>([]);
